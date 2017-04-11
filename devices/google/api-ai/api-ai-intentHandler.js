@@ -113,6 +113,32 @@ function intentHandlers(body) {
                     deferred.resolve(responseInfo);
                 });
             break;
+            
+             case "HELP":
+            handleHelpIntent(body, deferred)
+                .then(function (responseInfo) {
+                    deferred.resolve(responseInfo);
+                });
+            break;
+         case "MENU":
+            handleMenuIntent(body, deferred)
+                .then(function (responseInfo) {
+                    deferred.resolve(responseInfo);
+                });
+            break;  
+        case "AOS-RENTERS-QUOTESTART":
+            handleAosRentersQuoteStart(body, deferred)
+                .then(function (responseInfo) {
+                    deferred.resolve(responseInfo);
+                });
+            break;
+        case "AOS-RENTERS-QUOTESTART-NO":
+            handleAosRentersQuoteStartNo(body, deferred)
+                .then(function (responseInfo) {
+                    deferred.resolve(responseInfo);
+                });
+            break;      
+                 
         case "AOS-RENTERS-INSURANCE":
             handlerAOSRentersInsuranceStart(body, deferred)
                 .then(function (responseInfo) {
@@ -195,6 +221,12 @@ function intentHandlers(body) {
                     deferred.resolve(responseInfo);
                 });
             break;
+            case "AOS-RENTERS-CREDITHISTORY-AUTHORIZE":
+         handlerAOSRentersCrediHistoryAuthorize(body, deferred)
+                 .then(function (responseInfo) {
+                     deferred.resolve(responseInfo);
+                 });
+             break;
          case "AOS-RENTERS-EMPSTATUS":
             handlerAOSRentersEmpStatus(body, deferred)
                 .then(function (responseInfo) {
@@ -785,6 +817,22 @@ function handlerAOSRentersEmpStatus(body, deferred) {
     return deferred.promise;
 }
 
+function handlerAOSRentersCrediHistoryAuthorize(body, deferred) {
+    var rentersWelcomeSpeechResp = {};
+    var result = body.result;
+    var rentersCntx = result.contexts.find(function (curCntx) { return curCntx.name === "renters"; });
+    var sessionAttrs = getAOSRentersSessionAttributes(rentersCntx);
+
+    aos.handlerCreditHistoryAuthorize(sessionAttrs)
+        .then(function (renterspeechResponse) {
+            rentersWelcomeSpeechResp.speech = renterspeechResponse.speechOutput.text;
+            rentersWelcomeSpeechResp.displayText = renterspeechResponse.speechOutput.text;
+            deferred.resolve(rentersWelcomeSpeechResp);
+         });
+ 
+     return deferred.promise;
+ }
+
 function handlerAOSRentersGender(body, deferred) {
     var rentersWelcomeSpeechResp = {};
     var result = body.result;
@@ -1102,6 +1150,7 @@ function getAOSRentersSessionAttributes(contextInfo) {
         "prevstate" : undefined,
         "prevcity" : undefined,
         "prevaddrLine1" : undefined,
+         "isCreditAuthorized" : undefined
     };
 
     if (contextInfo) {
@@ -1278,6 +1327,10 @@ function getAOSRentersSessionAttributes(contextInfo) {
         if (prevaddrLine1 && prevaddrLine1.trim().length > 0) {
             sessionAttrs.prevaddrLine1 = contextInfo.parameters["prevaddress"];
         }
+        var isCreditAuthorized = contextInfo.parameters["isCreditAuthorized.original"];
+         if (isCreditAuthorized && isCreditAuthorized.trim().length > 0) {
+             sessionAttrs.isCreditAuthorized = contextInfo.parameters["isCreditAuthorized"];
+         }
         var prevcity = contextInfo.parameters["prevcity.original"];
         if (prevcity && prevcity.trim().length > 0) {
             sessionAttrs.prevcity = contextInfo.parameters["prevcity"];
