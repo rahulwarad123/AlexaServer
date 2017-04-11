@@ -20,6 +20,7 @@ var AOSTranData = [];
 //#region CONSTANTS
 var URL_COMMON = "https://purchase-stest.allstate.com/onlinesalesapp-common/";
 var URL_RENTERS_SESSIONID = URL_COMMON + "api/transaction/RENTERS/sessionid";
+var URL_GETAGENTS = URL_COMMON + "api/common/agents";
 var URL_AUTO_SESSIONID = URL_COMMON + "api/transaction/AUTO/sessionid";
 var URL_GETAGENTS = URL_COMMON + "api/common/agents";
 var URL_GETSTATE = URL_COMMON + "api/location/{0}/state";
@@ -214,16 +215,9 @@ AOS.prototype.handlerRentersEmailAddress = function (sessionAttrs) {
     var speechOutput = new Speech();
     var repromptOutput = new Speech();
     rentersFindSpeechResp.contextOut = [];
-    if (sessionAttrs.addrLine1) {
-        speechOutput.text = "Okay, great! Now I need some info on where you live. What's the CITY and ZIP code of your current address?";
-        rentersFindSpeechResp.speechOutput = speechOutput;
-        rentersFindSpeechResp.repromptOutput = speechOutput;
-    } else {
-        speechOutput.text = "To get your current location";
-        rentersFindSpeechResp.speechOutput = speechOutput;
-        rentersFindSpeechResp.repromptOutput = speechOutput;
-        rentersFindSpeechResp.contextOut.push({ "name": "PermissionSeekingIntent", "parameters": { "IntentName": "AOS-RENTERS-CURADDR" } });
-    }
+    speechOutput.text = "Okay, great! Now I need some info on where you live. What's the CITY and ZIP code of your current address?";
+     rentersFindSpeechResp.speechOutput = speechOutput;
+     rentersFindSpeechResp.repromptOutput = speechOutput; 
     rentersFindSpeechResp.sessionAttrs = sessionAttrs;
     deferred.resolve(rentersFindSpeechResp);
 
@@ -397,6 +391,23 @@ AOS.prototype.handlerRentersDiffAddress = function (sessionAttrs) {
 
     return deferred.promise;
 };
+
+AOS.prototype.handlerCreditHistoryAuthorize = function (sessionAttrs) {
+     var deferred = q.defer();
+     var rentersFindSpeechResp = new SpeechResponse();
+     var speechOutput = new Speech();
+     var repromptOutput = new Speech();
+ 
+     speechOutput.text = "Information from outside sources regarding credit history is used to provide you with a renters quote. A third party may be used to calculate your insurance score. This information, along with subsequently collected information, will be shared with outside parties that perform services on Allstate's behalf. ";
+     speechOutput.text = speechOutput.text + "   Privacy Policy:http://www.allstate.com/about/privacy-statement-aic.aspx ";
+     speechOutput.text = speechOutput.text + "   Type OK to authorize.";
+    speechOutput.text = "Great! Next I'll need to know a little about your employment status. Are you employed, self employed, unemployed, student, retired, home maker or military";
+     rentersFindSpeechResp.speechOutput = speechOutput;
+     rentersFindSpeechResp.repromptOutput = speechOutput;
+     deferred.resolve(rentersFindSpeechResp);
+ 
+     return deferred.promise;
+ };
 
 AOS.prototype.handlerRentersEmpStatus = function (sessionAttrs) {
     var deferred = q.defer();
@@ -1003,6 +1014,9 @@ function getRentersSaveCustomerResponse(sessionAttrs) {
                 saveCustSpeechOutput.sessionAttrs = sessionAttrs;
                 
                 saveCustSpeechOutput.text = "Great! Next I'll need to know a little about your employment status. Are you employed, self employed, unemployed, student, retired, home maker or military";
+             saveCustSpeechOutput.text = "Information from outside sources regarding credit history is used to provide you with a renters quote. A third party may be used to calculate your insurance score. This information, along with subsequently collected information, will be shared with outside parties that perform services on Allstate's behalf. ";
+                 saveCustSpeechOutput.text = saveCustSpeechOutput.text + "   Privacy Policy:http://www.allstate.com/about/privacy-statement-aic.aspx ";
+                 saveCustSpeechOutput.text = saveCustSpeechOutput.text + "   Type OK to authorize.";
             }
             deferred.resolve(saveCustSpeechOutput);
         }).catch(function (error) {
@@ -1680,6 +1694,27 @@ function ProcessQuoteResponse(retrieveQuoteServResp) {
     return quotes;
 }
 
+function ProcessAgentResponse(agentServResp) {
+     var agents = [];
+     if (agentServResp && agentServResp.agentAvailable && agentServResp.agents.length > 0) {
+         for (var index = 0; index < agentServResp.agents.length; index++) {
+             var currServAgent = agentServResp.agents[index];
+             var agentInfo = new Agent();
+            agentInfo.id = currServAgent.id;
+            agentInfo.name = currServAgent.name;
+             agentInfo.addressLine1 = currServAgent.addressLine1;
+             agentInfo.city = currServAgent.city;
+             agentInfo.state = currServAgent.state;
+             agentInfo.zipCode = currServAgent.zipCode;
+             agentInfo.phoneNumber = currServAgent.phoneNumber;
+             agentInfo.imageUrl = currServAgent.imageURL;
+             agentInfo.emailAddress = currServAgent.emailAddress;
+             agents.push(agentInfo);
+         }
+     }
+ 
+     return agents;
+ }
 //#endregion
 
 //#region SPOUSE
