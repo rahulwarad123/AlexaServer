@@ -1848,6 +1848,53 @@ function handlerAOSRentersIsSpouseNo(body, deferred) {
 //#endregion
 
 
+function handleWelcomeIntent(body, deferred) {
+    var welcomeSpeechResp = {};
+    welcomeSpeechResp.speech = "Welcome to the Allstatebot. I can help you with your insurance-related questions.  ";
+
+    welcomeSpeechResp.speech = welcomeSpeechResp.speech + "    You can choose from options: Get Renters Quote, Help.";
+    welcomeSpeechResp.displayText = welcomeSpeechResp.speech;
+    deferred.resolve(welcomeSpeechResp);
+    return deferred.promise;
+}
+
+function handleHelpIntent(body, deferred) {
+    var helpSpeechResp = {};
+    helpSpeechResp.speech = "I can help! Simply select one of the menu options below or type a question or phrase.   ";
+
+    helpSpeechResp.speech = helpSpeechResp.speech + "    I can also connect you with a community manager. Just type Get Live Help";
+    helpSpeechResp.displayText = helpSpeechResp.speech;
+    deferred.resolve(helpSpeechResp);
+    return deferred.promise;
+}
+
+function handleMenuIntent(body, deferred) {
+    var helpSpeechResp = {};
+    helpSpeechResp.speech = "Okay! Simply select one of the menu options like get me renters quote or type a question or phrase. If you need any assistance at any time, just type help.   ";
+    helpSpeechResp.displayText = helpSpeechResp.speech;
+    deferred.resolve(helpSpeechResp);
+    return deferred.promise;
+}
+
+
+function handleAosRentersQuoteStart(body, deferred) {
+    var helpSpeechResp = {};
+    helpSpeechResp.speech = "At this time, I can only provide a quote for renters insurance. Would you like to get a renters quote?   ";
+    helpSpeechResp.displayText = helpSpeechResp.speech;
+    deferred.resolve(helpSpeechResp);
+    return deferred.promise;
+}
+
+
+function handleAosRentersQuoteStartNo(body, deferred) {
+    var helpSpeechResp = {};
+    helpSpeechResp.speech = "Type help to get a help   ";
+    helpSpeechResp.displayText = helpSpeechResp.speech;
+    deferred.resolve(helpSpeechResp);
+    return deferred.promise;
+}
+
+
 
 module.exports = new ApiAiIntentHandler();
 
